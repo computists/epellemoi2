@@ -6,6 +6,7 @@ import Words from "./components/words";
 import NavbarMain from "./components/navbar";
 import ShowSingleWord from "./components/showSingleWord";
 import EditWord from "./components/editWord";
+import Test from "./components/test";
 
 import './App.css';
 
@@ -18,6 +19,7 @@ function App() {
         <Route path='/words' element={<Words />} />
         <Route path='/words/:id' element={<ShowSingleWord />} />
         <Route path='/edit/:id' element={<EditWord />} />
+        <Route path='/test' element={<Test />} />
       </Routes>
 
     </div>

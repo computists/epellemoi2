@@ -9,6 +9,7 @@ import { Provider } from 'react-redux';
 //import rootReducer from './reducers/rootReducer';
 import postsSlice from './reducers/postsSlice';
 
+//const store = configureStore({reducer: postsSlice});
 const store = configureStore(postsSlice);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

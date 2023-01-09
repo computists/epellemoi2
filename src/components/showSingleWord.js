@@ -28,6 +28,17 @@ const ShowSingleWord = () => {
         navigate(`/edit/${userWord._id}`)
     }
 
+    // ref : https://codepen.io/sgestrella/pen/QodzgY
+    // ref : https://wicg.github.io/speech-api/#examples-synthesis
+    const synth = window.speechSynthesis;
+    const onButtonPlayClick = (props) => {
+        const utterThis = new SpeechSynthesisUtterance();
+        utterThis.text = props;
+        utterThis.lang = 'fr-french';
+        utterThis.rate = 0.7;
+        synth.speak(utterThis);
+    }
+
     return (
         <div>
             <section>
@@ -38,10 +49,17 @@ const ShowSingleWord = () => {
                     </Card.Header>
                     <Card.Body>
                         <Card.Title> 
-                            {userWord.word} 
+                            {userWord.word}
+                            <Button variant="primary" onClick={() => {onButtonPlayClick(userWord.word)}}>listen</Button> 
                         </Card.Title>
-                        <Card.Text> {userWord.def} </Card.Text>
-                        <Card.Text> {userWord.ex} </Card.Text>
+                        <Card.Text> 
+                            {userWord.def}
+                            <Button variant="primary" onClick={() => {onButtonPlayClick(userWord.def)}}>listen</Button>  
+                        </Card.Text>
+                        <Card.Text> 
+                            {userWord.ex}
+                            <Button variant="primary" onClick={() => {onButtonPlayClick(userWord.ex)}}>listen</Button>  
+                        </Card.Text>
                     </Card.Body>
                     <Card.Footer>
                         <Button variant="primary" onClick={onButtonBackClick}>Back</Button>

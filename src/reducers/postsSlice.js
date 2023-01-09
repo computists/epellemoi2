@@ -71,6 +71,7 @@ const postsSlice = createSlice({
   name: "posts",
   initialState,
   reducers: {
+    
   },
   extraReducers(builder) {
     builder
@@ -115,8 +116,6 @@ const postsSlice = createSlice({
   },
 });
 
-export default postsSlice;
-
 export const selectAllPosts = (state) => state.posts;
 
 export const selectPostById = (state, postId) =>
@@ -124,4 +123,9 @@ export const selectPostById = (state, postId) =>
 
 export const selectPostBy_Id = (state, post_Id) =>
   state.posts.find((post) => post._id === post_Id);
-  
+
+export default postsSlice;
+
+//export { fetchPosts, addNewPost, editPost, deletePost } = actions;
+//const { actions, reducer } = postsSlice;
+//export default reducer;
