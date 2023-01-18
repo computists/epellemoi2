@@ -25,10 +25,10 @@ const WordExcerpt = ({userWord}) => {
                     <Card.Text> {userWord.ex} </Card.Text>
                     
                 </Card.Body>
-                <Card.Footer>
+                {/* <Card.Footer>
                     <Card.Link href="#">Card Link</Card.Link>
                     <Card.Link href="#">Another Link</Card.Link>
-                </Card.Footer>
+                </Card.Footer> */}
             </Card>
         </Col>
     )
