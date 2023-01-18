@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import './navbar.css';
 import { UserContext } from "../contexts/user.context";
+import { Link } from "react-router-dom";
 
 const NavbarMain = () => {
     const { user, logOutUser } = useContext(UserContext);
@@ -14,11 +15,11 @@ const NavbarMain = () => {
     const LogOutOrIn = () => {
         return user ?
             <li className="nav-item">
-                <a className="nav-link" href="/" onClick={logOut}>Logout</a>
+                <Link className="nav-link" to="/" onClick={logOut}>Logout</Link>
             </li>
             :
             <li className="nav-item">
-                <a className="nav-link" href="/login">LogIn</a>
+                <Link className="nav-link" to="/login">LogIn</Link>
             </li>
             
     }
@@ -26,7 +27,7 @@ const NavbarMain = () => {
   return (
     <section className='nav-section'>
         <nav className="navbar navbar-expand-lg navbar-light bg-light CustomNavbar">
-        <a className="navbar-brand" href="/">Eppelle Moi</a>
+        <Link className="navbar-brand" to="/">Eppelle Moi</Link>
         <button
             className="navbar-toggler"
             type="button"
@@ -42,13 +43,13 @@ const NavbarMain = () => {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
             <ul className="navbar-nav mr-auto">
                 <li className="nav-item active">
-                    <a className="nav-link" href="/">Home</a>
+                    <Link className="nav-link" to="/">Home</Link>
                 </li>
                 <li className="nav-item">
-                    <a className="nav-link" href="/words">Words</a>
+                    <Link className="nav-link" to="/words">Words</Link>
                 </li>
                 <li className="nav-item">
-                    <a className="nav-link" href="/test">Test</a>
+                    <Link className="nav-link" to="/test">Test</Link>
                 </li>
                 
                 <LogOutOrIn />
