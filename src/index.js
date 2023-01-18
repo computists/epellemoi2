@@ -8,6 +8,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 //import rootReducer from './reducers/rootReducer';
 import postsSlice from './reducers/postsSlice';
+import { UserProvider } from './contexts/user.context';
 
 //const store = configureStore({reducer: postsSlice});
 const store = configureStore(postsSlice);
@@ -17,7 +18,9 @@ root.render(
   //<React.StrictMode>
     <BrowserRouter>
       <Provider store={store}>
-        <App />
+        < UserProvider >
+          <App />
+        </UserProvider>
       </Provider>
     </BrowserRouter>
   //</React.StrictMode>

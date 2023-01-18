@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { selectPostBy_Id } from "../reducers/postsSlice";
+import { selectPostBy_Id, setStatus } from "../reducers/postsSlice";
 import { editPost } from "../reducers/postsSlice";
 
 import Button from "react-bootstrap/Button";
@@ -9,8 +9,12 @@ import Form from "react-bootstrap/Form";
 import Card from "react-bootstrap/Card";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import { UserContext } from "../contexts/user.context";
+
 
 const EditWord = () => {
+    const { user } = useContext(UserContext);
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const param = useParams();
@@ -39,10 +43,11 @@ const EditWord = () => {
     const onFormSubmit = async (e) => {
         e.preventDefault();
         try {
-            await dispatch(editPost(word)).unwrap();
+            await dispatch(editPost({word: word, user: user})).unwrap();
         } catch (err) {
             console.error("Failed to edit the post : ", err);
           } finally {
+            dispatch(setStatus("idle"));
             navigate('/words')
           }
     }

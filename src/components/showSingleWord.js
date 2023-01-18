@@ -5,8 +5,12 @@ import Button from 'react-bootstrap/Button';
 
 import { selectPostById } from '../reducers/postsSlice';
 import { deletePost } from '../reducers/postsSlice';
+import { useContext } from 'react';
+import { UserContext } from '../contexts/user.context';
+import { setStatus } from '../reducers/postsSlice';
 
 const ShowSingleWord = () => {
+    const { user } = useContext(UserContext);
 
     const param = useParams();
     const id = param.id;
@@ -19,8 +23,9 @@ const ShowSingleWord = () => {
         navigate('/words');
     }
     const onButtonDeleteClick = () => {
-        dispatch(deletePost(userWord._id));
-        alert("Selected word card is deleted.")
+        dispatch(deletePost({id:userWord._id, user:user}));
+        alert("Selected word card is deleted.");
+        dispatch(setStatus("idle"));
         navigate('/words');
     }
 

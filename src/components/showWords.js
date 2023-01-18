@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from "react-redux";
 
@@ -8,11 +8,12 @@ import Row from 'react-bootstrap/Row';
 
 import { Spinner } from "./spinner";
 import { selectAllPosts, fetchPosts } from '../reducers/postsSlice';
+import { UserContext } from "../contexts/user.context";
 
 const WordExcerpt = ({userWord}) => {
     return (
-        <Col key={userWord._id}>
-            <Card style={{ width: '25rem' }}>
+        <Col>
+            <Card style={{ width: '25rem' }}  key={userWord._id}>
                 <Card.Header>
                     <Link to={`/words/${userWord.id}`}>
                         {userWord.word}
@@ -39,16 +40,15 @@ const ShowWords = () => {
 
     const postStatus = useSelector((state) => state.status);
     const error = useSelector((state) => state.error);
+    const { user } = useContext(UserContext);
     let viewCards;
     
 
     useEffect(() => {
         if(postStatus === 'idle') {
-            dispatch(fetchPosts());
+            dispatch(fetchPosts(user));
         }
     }, [postStatus, dispatch]);
-
-    console.log(postStatus)
 
     if(postStatus === 'loading') {
         viewCards = <Spinner text="Loading..." />

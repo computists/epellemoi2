@@ -1,69 +1,130 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
+import { gql, request } from "graphql-request"
+import { GRAPHQL_ENDPOINT } from "../realm/constants";
+
 const initialState = {
   posts: [],
   status: "idle",
   error: null,
 };
 
-export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
-  const response = await fetch("http://localhost:5000/record/");
-  if (!response.ok) {
-    const message = `An error occurred : ${response.statusText}`;
-    window.alert(message);
-    return;
+export const fetchPosts = createAsyncThunk("posts/fetchPosts", async (user) => {
+  const getAllRecordsQuery = gql`
+  query getAllRecords {
+    records(sortBy: CREATEDAT_DESC) {
+      _id
+      ex
+      id
+      word
+      author
+      createdAt
+      def
+    }
   }
-  const records = await response.json();
-  return records;
+  `;
+
+  const queryVariables = {};
+  const headers = { Authorization: `Bearer ${user._accessToken}` }
+  
+  const response = await request(GRAPHQL_ENDPOINT,
+    getAllRecordsQuery,
+    queryVariables,
+    headers
+  );
+
+  return response.records;
 });
 
 export const addNewPost = createAsyncThunk(
   "posts/addNewPost",
-  async (newData) => {
-    const response = await fetch("http://localhost:5000/record/add", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newData),
-    }).catch((error) => {
-      window.alert(error);
-      return;
-    });
-
-    return response.json();
+  async (values) => {
+    const createRecordQuery = gql`
+    mutation AddRecord($data: RecordInsertInput!) {
+      insertOneRecord(data: $data) {
+        _id
+      }
+    }
+    `;
+    const queryVariables = {
+      data: values.newData
+    };
+    const headers = { Authorization: `Bearer ${values.userData._accessToken}` };
+    const response = await request(GRAPHQL_ENDPOINT, createRecordQuery, queryVariables, headers);
+    console.log(response)
+    return;
   }
-);
+)
+
+
+
+
+
+
+
+
+
 
 
 export const deletePost = createAsyncThunk(
   "posts/deletePost",
-  async (id) => {
-    const response = await fetch(`http://localhost:5000/record/del/${id}`,{method: "DELETE"});
-    
-    if(!response.ok) {
-        const message = `An error occurred : ${response.statusText}`;
-        window.alert(message);
-        return;
+  async (values) => {
+    const _id = values.id;
+    const user = values.user;
+    const deleteRecordQuery = gql`
+  mutation DeleteRecord($query: RecordQueryInput!) {
+    deleteOneRecord(query: $query) {
+      _id
     }
-    return id;
   }
-);
+  `;
+  const queryVariables = { query: { _id } };
+  const headers = { Authorization: `Bearer ${user._accessToken}` };
+  const resp = window.confirm("Are you sure you want to delete this word?");
+  console.log(_id)
+  console.log(user)
+  console.log(resp)
+    if (!resp) return;
+
+    const response = await request(GRAPHQL_ENDPOINT, deleteRecordQuery, queryVariables, headers);
+    console.log(response)
+    
+  });
+
+
+
+
+  
 
 export const editPost = createAsyncThunk(
   "posts/editPost",
-  async (userWord) => {
-    const response = await fetch(`http://localhost:5000/edit/${userWord._id}`, {
-      method: "POST",
-      headers: {
-          "Content-Type": "application/json",
-        },
-      body: JSON.stringify(userWord),
-    });
-    
-    console.log(response);
-
-    return userWord;
+  async (values) => {
+    console.log(values)
+    const _id = values.word._id;
+    const user = values.user;
+    const editRecordMutation = gql`
+    mutation EditRecord($query: RecordQueryInput!, $set: RecordUpdateInput!) {
+      updateOneRecord(query: $query, set: $set) {
+        _id
+      }
+    }
+    `;
+    const queryAndUpdateVariables = {
+      query: {
+        _id: values.word._id
+      },
+      set: {
+        ex : values.word.ex,
+        id : values.word.id,
+        word : values.word.word,
+        author : values.word.author,
+        createdAt : values.word.createdAt,
+        def : values.word.def
+      },
+    };
+    const headers = { Authorization: `Bearer ${user._accessToken}` };
+    const response = await request(GRAPHQL_ENDPOINT, editRecordMutation, queryAndUpdateVariables, headers);
+    console.log(response)
   }
 );
 
@@ -71,7 +132,9 @@ const postsSlice = createSlice({
   name: "posts",
   initialState,
   reducers: {
-    
+    setStatus(state, action) {
+      state.status = action.payload;
+    }
   },
   extraReducers(builder) {
     builder
@@ -89,7 +152,7 @@ const postsSlice = createSlice({
       })
       // addNewPost
       .addCase(addNewPost.fulfilled, (state, action) => {
-        state.posts.push(action.payload);
+        //state.posts.push(action.payload);
       })
       // deletePost
       .addCase(deletePost.pending, (state, action) => {
@@ -97,20 +160,12 @@ const postsSlice = createSlice({
       })
       .addCase(deletePost.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.posts = state.posts.filter((post) => post._id !== action.payload )
-        state.error = action.error.message;
       })
       .addCase(editPost.pending, (state, action) => {
         state.status = "idle";
       })
       .addCase(editPost.fulfilled, (state, action) => {
         state.status = "succeeded";
-        let id = action.payload._id;
-        state.posts = state.posts.map((post) => {
-          return (post._id === id) ? action.payload : post;
-        }
-        );
-        
       });
       
   },
@@ -124,8 +179,6 @@ export const selectPostById = (state, postId) =>
 export const selectPostBy_Id = (state, post_Id) =>
   state.posts.find((post) => post._id === post_Id);
 
-export default postsSlice;
+export const { setStatus } = postsSlice.actions;
 
-//export { fetchPosts, addNewPost, editPost, deletePost } = actions;
-//const { actions, reducer } = postsSlice;
-//export default reducer;
+export default postsSlice;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useState } from "react";
 
 import Button from "react-bootstrap/Button";
@@ -8,27 +8,29 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
 import { useDispatch } from "react-redux";
-import { addNewPost } from "../reducers/postsSlice";
+import { addNewPost, setStatus } from "../reducers/postsSlice";
+import { UserContext } from "../contexts/user.context";
 
 const AddWords = () => {
   const dispatch = useDispatch();
+  const { user } = useContext(UserContext);
   
-  const [word, setWord] = useState({ id: "", word: "", def: "", ex: "" });
+  const [word, setWord] = useState({ id: "", word: "", def: "", ex: "", author: user.id, createdAt: new Date() });
 
-  const [addRequestStatus, setAddRequestStatus] = useState('idle')
-  const canSave = [word.id, word.word, word.def].every(Boolean) && addRequestStatus === 'idle'
-
+  const canSave = [word.id, word.word, word.def].every(Boolean);
+  
   const onFormSubmit = async (e) => {
     e.preventDefault();
     if(canSave) {
       try {
-        setAddRequestStatus('pending');
-        await dispatch(addNewPost(word)).unwrap();
-        setWord({ id: "", word: "", def: "", ex: "" })
+        console.log(user)
+        await dispatch(addNewPost({newData:word, userData: user})).unwrap();
+        setWord({ id: "", word: "", def: "", ex: "", author: user.id, createdAt: new Date() })
       } catch (err) {
         console.error("Failed to save the post : ", err);
       } finally {
-        setAddRequestStatus('idle')
+        dispatch(setStatus("idle"));
+        
       }
     }
   };

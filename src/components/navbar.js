@@ -1,7 +1,28 @@
-import React from "react";
+import React, { useContext } from "react";
 import './navbar.css';
+import { UserContext } from "../contexts/user.context";
 
 const NavbarMain = () => {
+    const { user, logOutUser } = useContext(UserContext);
+
+    const logOut = async () => {
+        await logOutUser();
+        window.location.reload(true);
+        return;
+      }
+    
+    const LogOutOrIn = () => {
+        return user ?
+            <li className="nav-item">
+                <a className="nav-link" href="/" onClick={logOut}>Logout</a>
+            </li>
+            :
+            <li className="nav-item">
+                <a className="nav-link" href="/login">LogIn</a>
+            </li>
+            
+    }
+
   return (
     <section className='nav-section'>
         <nav className="navbar navbar-expand-lg navbar-light bg-light CustomNavbar">
@@ -29,6 +50,8 @@ const NavbarMain = () => {
                 <li className="nav-item">
                     <a className="nav-link" href="/test">Test</a>
                 </li>
+                
+                <LogOutOrIn />
             </ul>
         </div>
         </nav>
